@@ -21,6 +21,7 @@ def get_chromedriver():
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
         options.add_argument('window-size=1200x600')
+        options.add_argument("--remote-debugging-port=9222")
         driver = webdriver.Chrome('/usr/local/bin/chromedriver', chrome_options=options)
         return driver
     except:
@@ -67,10 +68,8 @@ def main():
     import os
     from pypsrp.client import Client
     import re
-    from string import Template
     pkgdir = sys.modules['win_activate'].__path__[0]
     args = yamlarg.parse(os.path.join(pkgdir, 'arguments.yaml'))
-    print(args)
     for host in args['hosts'].split(','):
         if args['un'] is None:
             username = get_or_set_password(host, 'username')
@@ -95,23 +94,26 @@ def main():
                     ssl=ssl,
                     auth=args['auth']) as client:
             stdout, stderr, rc = client.execute_cmd('cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /ipk ' + args['pk'])
+            print(stdout)
             if 'Installed product key' not in stdout:
                 print('Product key not successfully installed on ' + host)
-                print(stdout)
             else:
                 stdout, stderr, rc = client.execute_cmd('cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /dti')
                 # output = s.run_cmd('cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /dti')
                 installation_id = re.match(r'Installation ID: (\d+)', stdout)
+                print(stdout)
                 if installation_id is None:
                     print('Error getting Installation ID on ' + host)
-                    print(stdout)
                 else:
+                    from selenium.webdriver.common.by import By
+                    from selenium.webdriver.support.ui import WebDriverWait
+                    from selenium.webdriver.support import expected_conditions as EC
                     driver = get_chromedriver()
                     driver.get(args['gointeract_url'])
-                    button = driver.find_element_by_xpath('/html/body/div[2]/div[2]/div/div[3]/ul/li[2]/a')
+                    button = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '/html/body/div[2]/div[2]/div/div[3]/ul/li[2]/a')))
                     button.click()
-                    form = driver.find_element_by_xpath(
-                        '/html/body/div[2]/div[2]/div/div[1]/p/table/tbody/tr[1]/td[1]/div[2]/div/input')
+                    form = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH,
+                        '/html/body/div[2]/div[2]/div/div[1]/p/table/tbody/tr[1]/td[1]/div[2]/div/input')))
                     form.send_keys('621269419226619141744168869550091732602151832659274865349851206')
                     button = driver.find_element_by_xpath('/html/body/div[2]/div[2]/div/ul/li[1]/a')
                     button.click()
@@ -125,7 +127,7 @@ def main():
                              '/html/body/div[2]/div[2]/div/div[1]/p/div/table/tbody/tr[6]/td[2]']
                     activation = ''
                     for part in parts:
-                        p = driver.find_element_by_xpath(part)
+                        p = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, part)))
                         activation += p.text
                     # stdout, stderr, rc = client.execute_cmd(
                     #     'cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /atp ' + activation)
