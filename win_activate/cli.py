@@ -80,7 +80,7 @@ def main():
             password = get_or_set_password(host, 'password')
         else:
             password = args['pw']
-        with Client(host, username=username, password=password) as client:
+        with Client(host, username=username, password=password, check_tls_certs=args['cert_validation']) as client:
             stdout, stderr, rc = client.execute_cmd('cscript.exe /nologo "%systemroot%\system43\slmgr.vbs" /ipk ' + args['pk'])
             if 'Installed product key' not in stdout:
                 print('Product key not successfully installed on ' + host)
