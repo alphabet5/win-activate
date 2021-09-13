@@ -1,0 +1,6 @@
+
+.idea/*
+.DS_Store
+build/*
+dist/*
+win_activate.egg-info/*

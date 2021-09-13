@@ -1,0 +1,31 @@
+---
+hosts:
+  help: CSV of hosts to activate.
+  type: str
+  required: true
+pk:
+  help: Product key to install on the hosts.
+  type: str
+  required: true
+un:
+  help: Username to login to the hosts. If left blank the keychain will be searched and you will be prompted for each host.
+  type: str
+pw:
+  help: Password to login to the hosts. If left blank the keychain will be searched and you will be prompted for each host.
+  type: str
+winrm_url:
+  help: "Custom template url if the winrm urls don't match the format of 'https://${host}:5985/wsman' default: 'https://$host:5985/wsman'"
+  default: 'https://$host:5985/wsman'
+  type: str
+transport:
+  help: "Specify winrm transport. Default ntlm."
+  default: "ntlm"
+  type: str
+cert_validation:
+  help: "Specify if the winrm certificate should be validated. Default: ignore"
+  default: "ignore"
+  type: str
+gointeract_url:
+  help: "Manually specify the gointeract url. Default: 'https://microsoft.gointeract.io/interact/index?interaction=1461173234028-3884f8602eccbe259104553afa8415434b4581-05d1&accountId=microsoft&loadFrom=CDN&appkey=196de13c-e946-4531-98f6-2719ec8405ce&Language=English&name=pana&CountryCode=en-US&Click%20To%20Call%20Caller%20Id=+17142064889&startedFromSmsToken=3jUenpr&dnis=26&token=0Yr8Nd'"
+  default: "https://microsoft.gointeract.io/interact/index?interaction=1461173234028-3884f8602eccbe259104553afa8415434b4581-05d1&accountId=microsoft&loadFrom=CDN&appkey=196de13c-e946-4531-98f6-2719ec8405ce&Language=English&name=pana&CountryCode=en-US&Click%20To%20Call%20Caller%20Id=+17142064889&startedFromSmsToken=3jUenpr&dnis=26&token=0Yr8Nd"
+  type: str
