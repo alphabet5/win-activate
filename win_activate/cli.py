@@ -129,6 +129,7 @@ def main():
                     for part in parts:
                         p = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, part)))
                         activation += p.text
+                    driver.quit()
                     stdout, stderr, rc = client.execute_cmd(
                         'cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /atp ' + activation)
                     print(stdout)
