@@ -25,7 +25,7 @@ setuptools.setup(
     entry_points={'console_scripts': ['win-activate=win_activate.cli:main']},
     include_package_data=True,
     package_data={'win_activate': ['*'], },
-    install_requires=['pywinrm',
+    install_requires=['pypsrp',
                       'yamlarg',
                       'keyring',
                       'selenium'],
