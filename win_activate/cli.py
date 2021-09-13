@@ -129,11 +129,11 @@ def main():
                     for part in parts:
                         p = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, part)))
                         activation += p.text
-                    # stdout, stderr, rc = client.execute_cmd(
-                    #     'cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /atp ' + activation)
-                    # if 'deposited successfully' in stdout:
-                    #     print("Activation successfull for " + host)
-                    # else:
-                    #     print("Error on host " + host)
-                    #     print(stdout)
+                    stdout, stderr, rc = client.execute_cmd(
+                        'cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /atp ' + activation)
+                    print(stdout)
+                    if 'deposited successfully' in stdout:
+                        print("Activation successfull for " + host)
+                    else:
+                        print("Error on host " + host)
 
