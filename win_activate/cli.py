@@ -70,7 +70,7 @@ def main():
     from string import Template
     pkgdir = sys.modules['win_activate'].__path__[0]
     args = yamlarg.parse(os.path.join(pkgdir, 'arguments.yaml'))
-    target_template = Template(args['winrm_url'])
+    print(args)
     for host in args['hosts'].split(','):
         if args['un'] is None:
             username = get_or_set_password(host, 'username')
@@ -80,16 +80,31 @@ def main():
             password = get_or_set_password(host, 'password')
         else:
             password = args['pw']
-        with Client(host, username=username, password=password, cert_validation=args['cert_validation'], ssl=args['ssl'], auth=args['auth']) as client:
-            stdout, stderr, rc = client.execute_cmd('cscript.exe /nologo "%systemroot%\system43\slmgr.vbs" /ipk ' + args['pk'])
+        if args['ssl'].lower() in ['false', 'f', 'no', 'n']:
+            ssl = False
+        else:
+            ssl = True
+        if args['cert_validation'].lower() in ['false', 'f', 'no', 'n']:
+            cert_validation = False
+        else:
+            cert_validation = True
+        with Client(server=host,
+                    username=username,
+                    password=password,
+                    cert_validation=cert_validation,
+                    ssl=ssl,
+                    auth=args['auth']) as client:
+            stdout, stderr, rc = client.execute_cmd('cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /ipk ' + args['pk'])
             if 'Installed product key' not in stdout:
                 print('Product key not successfully installed on ' + host)
+                print(stdout)
             else:
                 stdout, stderr, rc = client.execute_cmd('cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /dti')
                 # output = s.run_cmd('cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /dti')
                 installation_id = re.match(r'Installation ID: (\d+)', stdout)
                 if installation_id is None:
                     print('Error getting Installation ID on ' + host)
+                    print(stdout)
                 else:
                     driver = get_chromedriver()
                     driver.get(args['gointeract_url'])
@@ -112,11 +127,11 @@ def main():
                     for part in parts:
                         p = driver.find_element_by_xpath(part)
                         activation += p.text
-                    stdout, stderr, rc = client.execute_cmd(
-                        'cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /atp ' + activation)
-                    if 'deposited successfully' in stdout:
-                        print("Activation successfull for " + host)
-                    else:
-                        print("Error on host " + host)
-                        print(stdout)
+                    # stdout, stderr, rc = client.execute_cmd(
+                    #     'cscript.exe /nologo "%systemroot%\system32\slmgr.vbs" /atp ' + activation)
+                    # if 'deposited successfully' in stdout:
+                    #     print("Activation successfull for " + host)
+                    # else:
+                    #     print("Error on host " + host)
+                    #     print(stdout)
 
